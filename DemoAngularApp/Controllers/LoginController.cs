@@ -61,7 +61,7 @@ namespace DemoAngularApp.Controllers
         /// <param name="detail"></param>
         /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage AddUser([FromBody]UserDetail detail)
+        public HttpResponseMessage AddUser([FromBody] UserDetail detail)
         {
             HttpResponseMessage msg = null;
             UserAddClass user = new UserAddClass();
@@ -92,8 +92,8 @@ namespace DemoAngularApp.Controllers
                             DataRow dr = dt.Rows[0];
                             user.UserId = Convert.ToInt32(dr[0]);
                             user.LoginId = Convert.ToInt32(dr[1]);
-                            user.emailId = Convert.ToString(dr[2]); 
-                            token = JwtAuthManager.GenerateJWTToken(detail.username,45);
+                            user.emailId = Convert.ToString(dr[2]);
+                            token = JwtAuthManager.GenerateJWTToken(detail.username, 45);
                             user.seckey = token;
                         }
                     }

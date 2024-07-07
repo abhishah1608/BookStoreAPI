@@ -52,6 +52,14 @@ namespace DemoAngularApp.Models
         public string product { get; set; }
 
         public string udf1 { get; set; }
+
+        public string CartGuid { get; set; }
+
+        public string StripeUrl { get; set; }
+
+        public string checkoutSessionId { get; set; }
+
+        public string language { get; set; }
     }
 
     public class paymentInfo
