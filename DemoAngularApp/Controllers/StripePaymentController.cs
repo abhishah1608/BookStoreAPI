@@ -99,7 +99,7 @@ namespace DemoAngularApp.Controllers
             string status = "success";
             List<SessionCustomField> options = session.CustomFields;
 
-            string language = "tr";
+            string language = "null";
 
             if(options != null && options.Count > 0)
             {
