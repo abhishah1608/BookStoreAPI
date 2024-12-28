@@ -60,6 +60,8 @@ namespace DemoAngularApp.Models
         public string checkoutSessionId { get; set; }
 
         public string language { get; set; }
+
+        public string IsReact { get; set; }
     }
 
     public class paymentInfo

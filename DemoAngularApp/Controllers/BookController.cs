@@ -129,6 +129,7 @@ namespace DemoAngularApp.Controllers
                             details.IsPurchased = Convert.ToString(dr["IsPurchased"]);
                             details.BookName = Convert.ToString(dr["BookName"]);
                             details.Price = Convert.ToDouble(dr["Price"]);
+                            details.BookPrice = Convert.ToDouble(dr["BookPrice"]);
                             list.Add(details);
                         }
                     }

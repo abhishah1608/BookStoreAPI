@@ -20,5 +20,8 @@ namespace DemoAngularApp.Models
         public string BookName { get; set; }
 
         public double Price { get; set; }
+
+        public double BookPrice { get; set; }
+
     }
 }

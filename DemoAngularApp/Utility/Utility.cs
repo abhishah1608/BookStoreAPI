@@ -16,19 +16,22 @@ namespace DemoAngularApp.Utility
             foreach (BookDetails book in booklist)
             {
                 SessionLineItemOptions option = new Stripe.Checkout.SessionLineItemOptions();
-                option.PriceData = new SessionLineItemPriceDataOptions
+                if (book.Quantity > 0)
                 {
-                    //UnitAmount = (long)book.BookPrice,
-                    UnitAmount = (long)(book.BookPrice*100),
-                    Currency = "inr",
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
-                    { 
-                        Name = book.BookName
-                    }
-                };
-                option.Quantity = (long)book.Quantity;
-                amount += book.BookPrice * book.Quantity;
-                list.Add(option);
+                    option.PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        //UnitAmount = (long)book.BookPrice,
+                        UnitAmount = (long)(book.BookPrice * 100),
+                        Currency = "inr",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = book.BookName
+                        }
+                    };
+                    option.Quantity = (long)book.Quantity;
+                    amount += book.BookPrice * book.Quantity;
+                    list.Add(option);
+                }
             }
 
             return list;

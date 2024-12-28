@@ -27,7 +27,19 @@ namespace DemoAngularApp.Controllers
         [JwtAuthentication]
         public HttpResponseMessage Checkout([FromBody] PaymentForm payment)
         {
-            var domain = ConfigurationManager.AppSettings["domainurl"].ToString();
+            string domain = null;
+            string surl = null;
+            if (payment.IsReact != "Y")
+            {
+                domain = ConfigurationManager.AppSettings["domainurl"].ToString();
+                surl = ConfigurationManager.AppSettings["surl"].ToString();
+            }
+            else
+            {
+                domain = ConfigurationManager.AppSettings["reactdomainurl"].ToString();
+                surl = ConfigurationManager.AppSettings["surl_react"].ToString();
+            }
+
             payment.CartGuid = Guid.NewGuid().ToString();
             string productInfo = payment.productinfo;
             List<BookDetails> bookDetails = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BookDetails>>(productInfo);
@@ -42,14 +54,16 @@ namespace DemoAngularApp.Controllers
                 list.Add(item);
             }
 
+            
+
             var options = new Stripe.Checkout.SessionCreateOptions
             {
-                SuccessUrl = ConfigurationManager.AppSettings["surl"],
+                SuccessUrl = surl,
                 CancelUrl = ConfigurationManager.AppSettings["cancelurl"],
                 LineItems = Utility.Utility.GenerateCheckoutList(bookDetails, out amount),
                 Mode = "payment",
                 CustomerEmail = payment.email,
-                ClientReferenceId = payment.CartGuid  
+                ClientReferenceId = payment.CartGuid
             };
 
             var service = new Stripe.Checkout.SessionService();
@@ -90,6 +104,45 @@ namespace DemoAngularApp.Controllers
         }
 
         [HttpGet]
+        public HttpResponse GetResponseFromStripeAPI_React([FromUri] string session_id)
+        {
+            var sessionService = new Stripe.Checkout.SessionService();
+            Stripe.Checkout.Session session = sessionService.Get(session_id);
+            string email = session.CustomerEmail;
+            string CartGuid = session.ClientReferenceId;
+            string status = "success";
+            List<SessionCustomField> options = session.CustomFields;
+
+            string language = "null";
+
+            if (options != null && options.Count > 0)
+            {
+                language = options[0].Key;
+            }
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "updatePayment";
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CartGuid", CartGuid);
+                cmd.Parameters.AddWithValue("@status", status);
+                cmd.Parameters.AddWithValue("@CHECKOUT_SESSION_ID", session_id);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            string redirectUrl = ConfigurationManager.AppSettings["redirecturl_react"];
+            redirectUrl += "/paymentStatus";
+
+            redirectUrl = redirectUrl + "/" + session_id;
+            HttpContext.Current.Response.Redirect(redirectUrl);
+            return null;
+        }
+
+
+        [HttpGet]
         public HttpResponse GetResponseFromStripeAPI([FromUri] string session_id)
         {
             var sessionService = new Stripe.Checkout.SessionService();
@@ -101,7 +154,7 @@ namespace DemoAngularApp.Controllers
 
             string language = "null";
 
-            if(options != null && options.Count > 0)
+            if (options != null && options.Count > 0)
             {
                 language = options[0].Key;
             }
@@ -120,15 +173,15 @@ namespace DemoAngularApp.Controllers
                 con.Close();
             }
             string redirectUrl = ConfigurationManager.AppSettings["redirecturl"];
-            if(language != null)
+            if (language != null)
             {
-                redirectUrl +=  "/" + language + "/app/paymentStatus";
+                redirectUrl += "/" + language + "/app/paymentStatus";
             }
             else
             {
                 redirectUrl += "/app/paymentStatus";
             }
-            
+
             redirectUrl = redirectUrl + "/" + session_id;
             HttpContext.Current.Response.Redirect(redirectUrl);
             return null;
