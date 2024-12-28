@@ -8,6 +8,9 @@ using System.Web.Http;
 using Newtonsoft;
 using System.Configuration;
 using DemoAngularApp.Auth;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace DemoAngularApp.Controllers
 {
@@ -51,6 +54,49 @@ namespace DemoAngularApp.Controllers
                 }
             }
             msg = Request.CreateResponse(System.Net.HttpStatusCode.OK, list);
+            return msg;
+        }
+
+        [HttpPost]
+        public HttpResponseMessage AddCartDetails([FromBody]List<CartDetails> cartDetails)
+        {
+            int retval = 0;
+            HttpResponseMessage msg = new HttpResponseMessage();
+            string xml = string.Empty;
+            var settings = new XmlWriterSettings
+            {
+                OmitXmlDeclaration = true, // Remove the XML declaration
+                Indent = true // Optional: makes the XML more readable
+            };
+
+            using (var stringWriter = new StringWriter())
+            using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+            {
+                var serializer = new XmlSerializer(typeof(List<CartDetails>));
+                serializer.Serialize(xmlWriter, cartDetails);
+                xml = stringWriter.ToString();
+            }
+
+            // perform sp transaction to convert.
+            // AddBookInCarts
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "AddBookInCarts";
+                    cmd.Parameters.AddWithValue("@CartDetails", xml);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    retval = 1;
+                }
+                catch(Exception ex) {
+                    retval = -1;
+                }
+            }
+            msg = Request.CreateResponse(System.Net.HttpStatusCode.OK, retval);
             return msg;
         }
 

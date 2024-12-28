@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Hubs\Notification.cs" />
     <Compile Include="Models\Book.cs" />
+    <Compile Include="Models\CartDetails.cs" />
     <Compile Include="Models\HistoryInfo.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\Logout.cs" />
