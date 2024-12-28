@@ -16,5 +16,9 @@ namespace DemoAngularApp.Models
         public string IsPurchased { get; set; }
 
         public int IsRemoved { get; set; }
+
+        public string BookName { get; set; }
+
+        public double Price { get; set; }
     }
 }

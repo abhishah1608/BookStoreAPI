@@ -100,6 +100,44 @@ namespace DemoAngularApp.Controllers
             return msg;
         }
 
+        [HttpGet]
+        public HttpResponseMessage GetCartDetailsList([FromUri]int UserId)
+        {
+            HttpResponseMessage msg = null;
+            List<CartDetails> list = null;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "GetCartDetailsList";
+                cmd.Parameters.Add("@UserId", UserId);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+                if (table != null && table.Rows != null && table.Rows.Count > 0)
+                {
+                    list = new List<CartDetails>();
+                    foreach (DataRow dr in table.Rows)
+                    {
+                        if (dr != null)
+                        {
+                            CartDetails details = new CartDetails();
+                            details.BookId = Convert.ToInt32(dr["Bookid"]);
+                            details.userId = Convert.ToInt32(dr["userId"]);
+                            details.Quantity = Convert.ToInt32(dr["Quantity"]);
+                            details.IsPurchased = Convert.ToString(dr["IsPurchased"]);
+                            details.BookName = Convert.ToString(dr["BookName"]);
+                            details.Price = Convert.ToDouble(dr["Price"]);
+                            list.Add(details);
+                        }
+                    }
+                }
+            }
+            msg = Request.CreateResponse(System.Net.HttpStatusCode.OK, list);
+            return msg;
+        }
+
         [HttpPost]
         public HttpResponseMessage AddOrder([FromBody]BookAddedInCart bookcart)
         {
