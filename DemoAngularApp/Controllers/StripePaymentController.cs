@@ -134,7 +134,7 @@ namespace DemoAngularApp.Controllers
                 con.Close();
             }
             string redirectUrl = ConfigurationManager.AppSettings["redirecturl_react"];
-            redirectUrl += "/paymentStatus";
+            redirectUrl += "/paymentstatus";
 
             redirectUrl = redirectUrl + "/" + session_id;
             HttpContext.Current.Response.Redirect(redirectUrl);
