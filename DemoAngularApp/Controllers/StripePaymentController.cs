@@ -173,14 +173,7 @@ namespace DemoAngularApp.Controllers
                 con.Close();
             }
             string redirectUrl = ConfigurationManager.AppSettings["redirecturl"];
-            if (language != null)
-            {
-                redirectUrl += "/" + language + "/app/paymentStatus";
-            }
-            else
-            {
-                redirectUrl += "/app/paymentStatus";
-            }
+            redirectUrl += "/app/paymentStatus";
 
             redirectUrl = redirectUrl + "/" + session_id;
             HttpContext.Current.Response.Redirect(redirectUrl);
